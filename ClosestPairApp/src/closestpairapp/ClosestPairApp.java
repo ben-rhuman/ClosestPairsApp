@@ -5,6 +5,7 @@ package closestpairapp;
  *
  */
 import java.lang.Math;
+import java.util.Arrays;
 
 public class ClosestPairApp {
 
@@ -14,7 +15,7 @@ public class ClosestPairApp {
     
     //Arrays holding coordinate values sorted by x and y coordinates.
     public static Point[] coordinateX = {new Point(2.0, 7.0), new Point(4.0,13.0), new Point(5.0,8.0), new Point(10.0,5.0), new Point(14.0,9.0), new Point(15.0,5.0), new Point(17.0,7.0), new Point(19.0,10.0), new Point(22.0,7.0), new Point(25.0,10.0), new Point(29.0,14.0), new Point(30.0,2.0)};
-    public static Point[] coordinateY = coordinateX;
+    public static Point[] coordinateY = {new Point(2.0, 7.0), new Point(4.0,13.0), new Point(5.0,8.0), new Point(10.0,5.0), new Point(14.0,9.0), new Point(15.0,5.0), new Point(17.0,7.0), new Point(19.0,10.0), new Point(22.0,7.0), new Point(25.0,10.0), new Point(29.0,14.0), new Point(30.0,2.0)};
     
     
     public static void main(String[] args) { // Start main
@@ -23,12 +24,31 @@ public class ClosestPairApp {
               val.print();
         System.out.print("\n---------------------------------------------");
         quickSort(0, coordinateY.length - 1);
+        closestPairs(coordinateX);
     } // End main
     
-    private static Point[] closestPairs(Point[] data){
-        if(data.length = 2) return
+    private static Pair closestPairs(Point[] data){
+        if(data.length == 1) return new Pair(data[0], null);
+        if(data.length == 2) return new Pair(data[0], data[1]);
+        int median = (data.length-1)/2;
+        Point[] sl = Arrays.copyOfRange(data, 0, median + 1);
+        Point[] sr = Arrays.copyOfRange(data, median + 1, data.length);
+        Pair dl = closestPairs(sl);
+        Pair dr = closestPairs(sr);
+        Pair dc = combine(median, data, min(dl,dr));
         
-    }// End closestPaits    
+    }// End closestPaits   
+    
+    private static double min(Pair dl, Pair dr){
+        if(dl.distance < dr.distance){
+            return dl.distance;
+        } else
+            return dr.distance;
+        } 
+    
+    private static Pair combine(int median, Point[] data, double dist){
+        
+    }
  
     private static void quickSort(int lowerIndex, int higherIndex) { // Start quicksort
          
@@ -91,10 +111,17 @@ class Pair{
     public Pair(Point left, Point right){
         this.left = left;
         this.right = right;
-        distance = calcDist(left, right);
+        if(right == null){
+            distance = Double.POSITIVE_INFINITY;
+        }else {
+            distance = calcDist(left, right);
+        }
+        System.out.println(distance);
     }
     
     public double calcDist(Point pl, Point pr){
-        return Math.sqrt((pl.x - pr.x)*(pl.x - pr.x)+(pl.y - pl.y)*(pl.y - pl.y));      
+        pl.print();
+        pr.print();
+        return Math.sqrt((pl.x - pr.x)*(pl.x - pr.x)+(pl.y - pr.y)*(pl.y - pr.y));      
     }
 }
