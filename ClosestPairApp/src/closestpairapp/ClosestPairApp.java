@@ -25,11 +25,11 @@ public class ClosestPairApp {
         }
         System.out.print("\n---------------------------------------------\n");
         quickSort(0, coordinateY.length - 1);
-        closestPairs(coordinateX);
+        closestPairs(coordinateX,0,coordinateX.length-1);
     } // End main
 
-    private static Pair closestPairs(Point[] data) {
-        System.out.println("Solving Problem: Point[" + 0 + "]...Point[" + (data.length - 1) + "]");
+    private static Pair closestPairs(Point[] data, int start, int end) {
+        //System.out.println("Solving Problem: Point[" + 0 + "]...Point[" + (data.length - 1) + "]");
         if (data.length == 1) {
             return new Pair(data[0], null);
         }
@@ -37,14 +37,18 @@ public class ClosestPairApp {
             return new Pair(data[0], data[1]);
         }
         int median = (data.length - 1) / 2;
-        System.out.println("  Dividing at Point[" + median + "]");
+        int divPoint = end/2;
+        System.out.println("  Dividing at Point[" + divPoint + "]");
         Point[] sl = Arrays.copyOfRange(data, 0, median + 1);
         Point[] sr = Arrays.copyOfRange(data, median + 1, data.length);
-    //    System.out.println("Solving Problem: Point[" + 0 + "]...Point[" + median + "]");
-        Pair dl = closestPairs(sl);
-    //    System.out.println("Solving Problem: Point[" + (median + 1) + "]...Point[" + data.length + "]");
-        Pair dr = closestPairs(sr);
-        Pair dc = combine(median, data, min(dl, dr).distance);
+        System.out.println("Solving Problem: Point[" + start + "]...Point[" + median + "]");
+        Pair dl = closestPairs(sl, start, median);
+        System.out.println("Solving Problem: Point[" + (median + 1) + "]...Point[" + end + "]");
+        Pair dr = closestPairs(sr, median + 1, end);
+        System.out.println("Combining Problems: Point["+start+"]...Point["+median+"] and Point["+(median + 1)+"]...Point["+ end +"]");
+        Pair dc = combine(median, data, min(dl, dr));
+        //dc.calcDist(dc.left, dc.right);
+        //System.out.printf("%.1f",dc.distance);
         return min(dl, dr, dc);
     }// End closestPaits   
 
@@ -57,7 +61,7 @@ public class ClosestPairApp {
     }
 
     private static Pair min(Pair dl, Pair dr, Pair dc) {
-        Pair sp = min(dl,dr);
+        Pair sp = min(dl, dr);
         if (sp.distance < dc.distance) {
             return sp;
         } else {
@@ -65,16 +69,41 @@ public class ClosestPairApp {
         }
     }
 
-    private static Pair combine(int median, Point[] data, double dist) {
-         ArrayList<Point> Ly = new ArrayList<Point>();
-         for (Point val : coordinateY) {
-             if(Math.abs(val.x - data[median].x) < dist){
-                 Ly.add(val);
-             }
-         }
+    private static Pair combine(int median, Point[] data, Pair md) {
+        ArrayList<Point> Ly = new ArrayList<Point>();
+        for (Point val : coordinateY) {
+            if (Math.abs(val.x - data[median].x) < md.distance) {
+                Ly.add(val);
+            }
+        }
+        for(int i = 0; i < Ly.size(); i++){
+            if(Ly.get(i).x <= median){
+                md = min(md, Ly, i);
+            }
+        }
+        return md;
     }
 
-    private static void quickSort(int lowerIndex, int higherIndex) { // Start quicksort
+    private static Pair min(Pair md, ArrayList<Point> Ly, int i) {    
+        for(int j = i-1; j > 0; j--){
+            if(j <= i-4){
+                break;
+            } else{
+                md = min(md, new Pair(Ly.get(j), Ly.get(i)));
+            }           
+        }
+        for(int j = i+1; i < Ly.size(); i++){
+            if(j >= i+4){
+                break;
+            } else {
+                md = min(md, new Pair(Ly.get(j), Ly.get(i)));
+            }
+        }
+        return md;
+    }
+
+
+private static void quickSort(int lowerIndex, int higherIndex) { // Start quicksort
 
         int i = lowerIndex;
         int j = higherIndex;
@@ -109,7 +138,9 @@ public class ClosestPairApp {
         }
         if (i < higherIndex) {
             quickSort(i, higherIndex);
-        }
+        
+
+}
     } // End quicksort
 }// End ClosestPairsApp class
 
@@ -140,10 +171,12 @@ class Pair {
         this.right = right;
         if (right == null) {
             distance = Double.POSITIVE_INFINITY;
+            System.out.print("Found result: INF\n");
         } else {
             distance = calcDist(left, right);
+            System.out.printf("%.1f\n", distance);
         }
-        System.out.printf("%.1f\n", distance);
+
     }
 
     public double calcDist(Point pl, Point pr) {
