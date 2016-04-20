@@ -25,33 +25,52 @@ public class ClosestPairApp {
         }
         System.out.print("\n---------------------------------------------\n");
         quickSort(0, coordinateY.length - 1);
+        System.out.println("Solving Problem: Point[0]...Point["+(coordinateX.length-1)+"]");
         closestPairs(coordinateX,0,coordinateX.length-1);
     } // End main
 
     private static Pair closestPairs(Point[] data, int start, int end) {
         //System.out.println("Solving Problem: Point[" + 0 + "]...Point[" + (data.length - 1) + "]");
         if (data.length == 1) {
-            return new Pair(data[0], null);
+            Pair p = new Pair(data[0], null);
+            printResult(p);
+            return p;
         }
         if (data.length == 2) {
-            return new Pair(data[0], data[1]);
+            Pair p = new Pair(data[0], data[1]);
+            printResult(p);
+            return p;
         }
         int median = (data.length - 1) / 2;
-        int divPoint = end/2;
-        System.out.println("  Dividing at Point[" + divPoint + "]");
+        int divPoint = start + ((end-start)/2);
+        System.out.println("  Dividing at Point[" + divPoint + "]");  //Prints out dividing point
         Point[] sl = Arrays.copyOfRange(data, 0, median + 1);
         Point[] sr = Arrays.copyOfRange(data, median + 1, data.length);
-        System.out.println("Solving Problem: Point[" + start + "]...Point[" + median + "]");
-        Pair dl = closestPairs(sl, start, median);
-        System.out.println("Solving Problem: Point[" + (median + 1) + "]...Point[" + end + "]");
-        Pair dr = closestPairs(sr, median + 1, end);
-        System.out.println("Combining Problems: Point["+start+"]...Point["+median+"] and Point["+(median + 1)+"]...Point["+ end +"]");
+        System.out.println("Solving Problem: Point[" + start + "]...Point[" + divPoint + "]");  //Prints out the segment of the original array that is being tested
+        Pair dl = closestPairs(sl, start, divPoint);
+        System.out.println("Solving Problem: Point[" + (divPoint + 1) + "]...Point[" + end + "]");  //Prints out the segment of the original array that is being tested
+        Pair dr = closestPairs(sr, divPoint + 1, end);
+        System.out.println("Combining Problems: Point["+start+"]...Point["+divPoint+"] and Point["+(divPoint + 1)+"]...Point["+ end +"]"); //Prints out the segments that are to be combined.
         Pair dc = combine(median, data, min(dl, dr));
         //dc.calcDist(dc.left, dc.right);
         //System.out.printf("%.1f",dc.distance);
-        return min(dl, dr, dc);
+        Pair dm = min(dl, dr, dc);
+        printResult(dm);
+        return dm;
     }// End closestPaits   
 
+    private static void printResult(Pair r){
+        if(r.distance < Double.POSITIVE_INFINITY){
+            System.out.print("  Found result: P1: ");
+            r.left.print();
+            System.out.print(", P2: ");
+            r.right.print();
+            System.out.printf(", Distance: %.1f\n",r.distance);
+        } else {
+            System.out.print("  Found result: INF\n");
+        }
+    }
+    
     private static Pair min(Pair dl, Pair dr) {
         if (dl.distance < dr.distance) {
             return dl;
@@ -87,14 +106,14 @@ public class ClosestPairApp {
     private static Pair min(Pair md, ArrayList<Point> Ly, int i) {    
         for(int j = i-1; j > 0; j--){
             if(j <= i-4){
-                break;
+                continue;//break;
             } else{
                 md = min(md, new Pair(Ly.get(j), Ly.get(i)));
             }           
         }
         for(int j = i+1; i < Ly.size(); i++){
             if(j >= i+4){
-                break;
+                continue;//break;
             } else {
                 md = min(md, new Pair(Ly.get(j), Ly.get(i)));
             }
@@ -171,20 +190,20 @@ class Pair {
         this.right = right;
         if (right == null) {
             distance = Double.POSITIVE_INFINITY;
-            System.out.print("Found result: INF\n");
+            //System.out.print("  Found result: INF\n");
         } else {
             distance = calcDist(left, right);
-            System.out.printf("%.1f\n", distance);
+            //System.out.printf("%.1f\n", distance);
         }
 
     }
 
     public double calcDist(Point pl, Point pr) {
-        System.out.print("Found result: P1: ");
-        pl.print();
-        System.out.print(", P2: ");
-        pr.print();
-        System.out.print(", Distance: ");
+        //System.out.print("Found result: P1: ");
+        //pl.print();
+        //System.out.print(", P2: ");
+        //pr.print();
+        //System.out.print(", Distance: ");
         return Math.sqrt((pl.x - pr.x) * (pl.x - pr.x) + (pl.y - pr.y) * (pl.y - pr.y));
     }
 }//End pair class
