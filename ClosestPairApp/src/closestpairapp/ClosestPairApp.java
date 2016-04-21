@@ -26,7 +26,14 @@ public class ClosestPairApp {
         System.out.print("\n---------------------------------------------\n");
         quickSort(0, coordinateY.length - 1);
         System.out.println("Solving Problem: Point[0]...Point[" + (coordinateX.length - 1) + "]");
-        closestPairs(coordinateX, 0, coordinateX.length - 1);
+        Pair finalPair = closestPairs(coordinateX, 0, coordinateX.length - 1);
+        System.out.println("-------------------------------------------------------------------");
+        System.out.print("Final result: P1: " );
+        finalPair.left.print();
+        System.out.print(", P2: ");
+        finalPair.right.print();
+        System.out.printf(", Distance: %.1f\n" , finalPair.distance);
+        
     } // End main
 
     private static Pair closestPairs(Point[] data, int start, int end) {
@@ -90,19 +97,21 @@ public class ClosestPairApp {
 
     private static Pair combine(int median, Point[] data, Pair md) {
         ArrayList<Point> Ly = new ArrayList<Point>();
+        Point medianP = data[median];
         coordinateY = data;
         quickSort(0,data.length - 1);
         
         for (Point val : coordinateY) {
-            if (Math.abs(val.x - data[median].x) < md.distance){
+            if (Math.abs(val.x - medianP.x) < md.distance){
                 Ly.add(val);
             }
         }
         for (int i = 0; i < Ly.size(); i++) {
             //System.out.print(Ly.size());
-            Ly.get(i).print();
-            if (Ly.get(i).x <= data[median].x) { 
-                                                                                   /////////////////////////////////////////
+            //Ly.get(i).print();
+            if (Ly.get(i).x <= medianP.x) {
+                //data[median].print();
+                //Ly.get(i).print();                                                                  /////////////////////////////////////////
                 md = minOfBand(md, Ly, i);                
             }
         }
@@ -134,7 +143,7 @@ public class ClosestPairApp {
         
         for(int j = i-3; j < i+4; j++){
             if(j > -1 && j < Ly.size() && j != i){
-                min = min(md, new Pair(Ly.get(j), Ly.get(i)));                         //////////////////////////////////////////////////////
+                min = min(md, new Pair(Ly.get(i), Ly.get(j)));                         //////////////////////////////////////////////////////
                 if(min.distance < md.distance){
                     md = min;
                 }
